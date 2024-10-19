@@ -7,9 +7,27 @@ import re
 
 import urllib
 
-from aaaa import contains_word_from_list, extract_text_with_spacing, fetch 
-
 app = Flask(__name__)
+
+
+
+def extract_text_with_spacing(html_content):
+    soup = BeautifulSoup(html_content, 'html.parser')
+    imageattributions = []
+    pattern = r"\(Photo by [^)]+\)"
+    textelements = []
+    attribution = False
+    for p in soup.find_all('p'):
+        text = p.get_text()
+        text_without_attribution = re.sub(pattern, '', text).strip()
+        textelements.append(text_without_attribution)
+        
+        match = re.search(pattern, text)
+        if match:
+            attribution = match.group()
+    
+    text = [' '.join(textelements), attribution]
+    return text
 
 
 def extract_actual_url(url):
